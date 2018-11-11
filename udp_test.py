@@ -5,7 +5,7 @@ import time
 
 UDP_IP = "192.168.0.202"
 
-UDP_PORT = 50000
+UDP_PORT = 54001
 
 socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 socket_client.connect((UDP_IP, UDP_PORT))

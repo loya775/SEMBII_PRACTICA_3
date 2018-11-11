@@ -45,6 +45,9 @@
 #include "ethernetif.h"
 
 #include "board.h"
+#include "fsl_edma.h"
+#include "fsl_dmamux.h"
+#include "rtos_edma.h"
 
 #include "fsl_device_registers.h"
 #include "pin_mux.h"
@@ -153,6 +156,10 @@ int main(void)
     BOARD_InitDebugConsole();
     /* Disable SYSMPU. */
     base->CESR &= ~SYSMPU_CESR_VLD_MASK;
+
+    edma_config_t userConfig;
+    dmaMUX_initialization(DMAMUX0);
+    edma_initialization(userConfig,DMA0);
 
     /* Initialize lwIP from thread */
     if(sys_thread_new("main", stack_init, NULL, INIT_THREAD_STACKSIZE, INIT_THREAD_PRIO) == NULL)

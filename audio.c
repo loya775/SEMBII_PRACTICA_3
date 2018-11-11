@@ -38,7 +38,7 @@ udp_server_thread(void *arg)
   struct netbuf *buf;
   LWIP_UNUSED_ARG(arg);
   conn = netconn_new(NETCONN_UDP);
-  netconn_bind(conn, IP_ADDR_ANY, 50000);
+  netconn_bind(conn, IP_ADDR_ANY, 54001);
   while(1)
   {
 	  netconn_recv(conn, &buf);

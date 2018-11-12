@@ -24,7 +24,7 @@
 
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
 #define BUFFER_SIZE 250
-#define PIT_PERIOD (1000000U/1000U)
+#define PIT_PERIOD (1000000U/2000U)
 
 static SemaphoreHandle_t sample_signal, buffer_ready_signal;
 static uint16_t buffer[2][BUFFER_SIZE];

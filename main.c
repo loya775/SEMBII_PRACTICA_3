@@ -163,7 +163,7 @@ int main(void)
 
     /* Initialize lwIP from thread */
     if(sys_thread_new("main", stack_init, NULL, INIT_THREAD_STACKSIZE, INIT_THREAD_PRIO) == NULL)
-        LWIP_ASSERT("main(): Task creation failed.", 0);
+        LWIP_ASSERT("main(): Task creation failed.", 1);
 
     vTaskStartScheduler();
 

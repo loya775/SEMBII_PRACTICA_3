@@ -24,7 +24,7 @@ AT_NONCACHEABLE_SECTION_INIT(uint32_t srcAddr[BUFF_LENGTH]) = {0x01, 0x02, 0x03,
 AT_NONCACHEABLE_SECTION_INIT(uint32_t destAddr[BUFF_LENGTH]) = {0x00, 0x00, 0x00, 0x00};
 
 
-int main(void)
+int main43(void)
 {
 	uint32_t i = 0;
     edma_transfer_config_t transferConfig;
@@ -38,7 +38,7 @@ int main(void)
         }
     dmaMUX_initialization(DMAMUX0);
     edma_initialization(userConfig,DMA0);
-    edma_transfer(transferConfig, srcAddr, destAddr, kEDMA_MemoryToMemory);
+    edma_transfer_nbytes(transferConfig, srcAddr, destAddr, kEDMA_MemoryToMemory,4);
 
     for (i = 0; i < BUFF_LENGTH; i++)
     {

@@ -12,9 +12,9 @@ socket_client.connect((UDP_IP, UDP_PORT))
 
 buffer_size = 250;
 
-Fs=2000
-f=2
-sample = 1000;
+Fs=5000
+f=5
+sample = buffer_size*4;
 song_data=[0]*sample
 for n in range(sample):
     song_data[n]= 2046*sin(2*pi*f*n/Fs) + 2048

@@ -3,9 +3,9 @@ from math import*
 import numpy as np
 import time
 
-UDP_IP = "192.168.0.202"
+UDP_IP = "192.168.0.105"
 
-UDP_PORT = 54001
+UDP_PORT = 55000
 
 socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 socket_client.connect((UDP_IP, UDP_PORT))
@@ -27,6 +27,7 @@ send_start = 0;
 send_end = buffer_size;
 cont_song = 0;
 
+socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
 while 1:
 
     socket_client.sendto(song_data[send_start:send_end], (UDP_IP, UDP_PORT))

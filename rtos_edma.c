@@ -34,7 +34,7 @@ void edma_initialization(edma_config_t Config,DMA_Type *DMA)
 
 void edma_transfer(edma_transfer_config_t  trans_config, void *srcAddr, void *destAddr, edma_transfer_type_t type, uint16_t size)
 {
-	EDMA_PrepareTransfer(&trans_config, srcAddr, 1, destAddr, 1, 222, size, type);
+	EDMA_PrepareTransfer(&trans_config, srcAddr, 1, destAddr, 1, 2, size, type);
 	EDMA_SubmitTransfer(&g_EDMA_Handle, &trans_config);
 	EDMA_StartTransfer(&g_EDMA_Handle);
 }

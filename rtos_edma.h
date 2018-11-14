@@ -19,6 +19,6 @@
 void edma_initialization(edma_config_t Config,DMA_Type *DMA);
 void edma_transfer(edma_transfer_config_t trans_config, void *srcAddr, void *destAddr, edma_transfer_type_t type, uint16_t size);
 void dmaMUX_initialization(DMAMUX_Type *base);
-
+void edma_wait();
 
 #endif /* RTOS_EDMA_H_ */

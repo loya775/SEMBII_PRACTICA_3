@@ -140,14 +140,10 @@ static void stack_init(void *arg)
     PRINTF("************************************************\r\n");
 
     udp_task_init();
-    dac_task_init();
 
     vTaskDelete(NULL);
 }
 
-/*!
- * @brief Main function
- */
 int main(void)
 {
     SYSMPU_Type *base = SYSMPU;

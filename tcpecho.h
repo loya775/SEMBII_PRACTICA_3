@@ -30,6 +30,8 @@
  *
  */
 
+#include <stdint.h>
+
 #ifndef LWIP_TCPECHO_H
 #define LWIP_TCPECHO_H
 /*
@@ -40,9 +42,11 @@ typedef struct
 	//Record_t Record;
 }Menu_handle_t;
 */
+uint8_t receiveDataForMenu(void);
 void printf_menu1(void);
 void printf_menu2(void);
 void printf_menu3(void);
 void tcpecho_init(void);
+
 
 #endif /* LWIP_TCPECHO_H */

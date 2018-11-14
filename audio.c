@@ -25,14 +25,17 @@
 #include "rtos_edma.h"
 
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
-#define BUFFER_SIZE 249
-#define PIT_PERIOD (1000000U/44100U)
+#define BUFFER_SIZE 279
+#define PIT_PERIOD ((1000000U/44100U) - 11)
 
 static SemaphoreHandle_t dac_signal[2];
 static uint8_t currentBuffer = 0, bufferIndex = 0, bufferIsReady[2] = {0};
 static uint16_t dacIndex = 0;
 struct netbuf *buf[2];
 uint8_t count = 0;
+
+struct netconn *conn;
+uint8_t listen = 1;
 /*-----------------------------------------------------------------------------------*/
 static void
 udp_server_thread(void *arg)
@@ -40,7 +43,7 @@ udp_server_thread(void *arg)
 	dac_init();
 	pit_init();
 
-	struct netconn *conn;
+	//struct netconn *conn;
 	LWIP_UNUSED_ARG(arg);
 	conn = netconn_new(NETCONN_UDP);
 	netconn_bind(conn, IP_ADDR_ANY, 54001);
@@ -67,6 +70,7 @@ void PIT0_IRQHandler(void)
     if(bufferIsReady[currentBuffer])
     {
 		uint16_t *temp = (uint16_t*) buf[currentBuffer]->ptr->payload;
+
 
 		if(*(temp + dacIndex) > 4095 || *(temp + dacIndex) < 0)
 		{
@@ -129,4 +133,26 @@ void pit_init(void)
 
 	/* Start channel 0 */
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+
+void udp_Stop_Audio(uint8_t Open_Close)
+{
+	if(Open_Close==2)
+	{
+		PIT_StartTimer(PIT, kPIT_Chnl_0);
+	}else if(Open_Close == 1)
+	{
+		PIT_StopTimer(PIT, kPIT_Chnl_0);
+	}
+}
+
+void udp_Change_Audio(uint8_t Open_Close)
+{
+	if(Open_Close==2)
+	{
+		netconn_bind(conn, IP_ADDR_ANY, 55000);
+	}else if(Open_Close == 1)
+	{
+		netconn_bind(conn, IP_ADDR_ANY, 60000);
+	}
 }

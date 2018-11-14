@@ -40,6 +40,7 @@
 
 #if LWIP_NETCONN
 
+#include "tcpecho.h"
 #include "lwip/tcpip.h"
 #include "netif/ethernet.h"
 #include "ethernetif.h"
@@ -62,7 +63,7 @@
 #define configIP_ADDR0 192
 #define configIP_ADDR1 168
 #define configIP_ADDR2 0
-#define configIP_ADDR3 202
+#define configIP_ADDR3 105
 
 /* Netmask configuration. */
 #define configNET_MASK0 255
@@ -74,7 +75,7 @@
 #define configGW_ADDR0 192
 #define configGW_ADDR1 168
 #define configGW_ADDR2 0
-#define configGW_ADDR3 100
+#define configGW_ADDR3 101
 
 /* MAC address configuration. */
 #define configMAC_ADDR {0x02, 0x12, 0x13, 0x10, 0x15, 0x11}
@@ -117,11 +118,14 @@ static void stack_init(void *arg)
         .macAddress = configMAC_ADDR,
     };
 
+    LWIP_UNUSED_ARG(arg);
+
     IP4_ADDR(&fsl_netif0_ipaddr, configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3);
     IP4_ADDR(&fsl_netif0_netmask, configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3);
     IP4_ADDR(&fsl_netif0_gw, configGW_ADDR0, configGW_ADDR1, configGW_ADDR2, configGW_ADDR3);
 
     tcpip_init(NULL, NULL);
+
 
     netif_add(&fsl_netif0, &fsl_netif0_ipaddr, &fsl_netif0_netmask, &fsl_netif0_gw,
               &fsl_enet_config0, ethernetif0_init, tcpip_input);
@@ -129,7 +133,7 @@ static void stack_init(void *arg)
     netif_set_up(&fsl_netif0);
 
     PRINTF("\r\n************************************************\r\n");
-    PRINTF(" UDP Echo example\r\n");
+    PRINTF(" TCP Echo example\r\n");
     PRINTF("************************************************\r\n");
     PRINTF(" IPv4 Address     : %u.%u.%u.%u\r\n", ((u8_t *)&fsl_netif0_ipaddr)[0], ((u8_t *)&fsl_netif0_ipaddr)[1],
            ((u8_t *)&fsl_netif0_ipaddr)[2], ((u8_t *)&fsl_netif0_ipaddr)[3]);
@@ -139,28 +143,33 @@ static void stack_init(void *arg)
            ((u8_t *)&fsl_netif0_gw)[2], ((u8_t *)&fsl_netif0_gw)[3]);
     PRINTF("************************************************\r\n");
 
-    udp_task_init();
+    PRINTF("\r\n************************************************\r\n");
 
+    tcpecho_init();
+    udp_task_init();
     vTaskDelete(NULL);
 }
 
+
+/*!
+ * @brief Main function
+ */
 int main(void)
 {
     SYSMPU_Type *base = SYSMPU;
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    /* Disable SYSMPU. */
+    /* Dis1
+     * able SYSMPU. */
     base->CESR &= ~SYSMPU_CESR_VLD_MASK;
 
     edma_config_t userConfig;
     dmaMUX_initialization(DMAMUX0);
     edma_initialization(userConfig,DMA0);
-
     /* Initialize lwIP from thread */
-    if(sys_thread_new("main", stack_init, NULL, INIT_THREAD_STACKSIZE, INIT_THREAD_PRIO) == NULL)
-        LWIP_ASSERT("main(): Task creation failed.", 1);
-
+    if(sys_thread_new("main", stack_init, NULL, 1024, INIT_THREAD_PRIO) == NULL)
+        LWIP_ASSERT("main(): Task creation failed.", 0);
     vTaskStartScheduler();
 
     /* Will not get here unless a task calls vTaskEndScheduler ()*/

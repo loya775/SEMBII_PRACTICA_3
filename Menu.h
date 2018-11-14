@@ -13,9 +13,9 @@
 #include "tcpecho.h"
 #include "lwip/opt.h"
 
-void Menu_StopReady();
-void Menu_SelectAudio();
-void Menu_Display();
+void Menu_StopReady(uint8_t StopStart);
+void Menu_SelectAudio(uint8_t StopStart);
+void Menu_Display(uint8_t StopStart);
 void choose_function(uint8_t State);
 
 

@@ -41,26 +41,31 @@
 
 #define GET_ARGS(args,type) *((type*)args)
 
-uint32_t size = sizeof("1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion");
-uint32_t* Menu = (uint32_t*)"1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion";
+uint32_t size = sizeof("1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion\n");
+uint32_t* Menu = (uint32_t*)"1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion\n";
 
-uint32_t size1 = sizeof("Ingresa un valor valido entre 1 y 3");
-uint32_t* NoValue = (uint32_t*)"Ingresa un valor valido entre 1 y 3";
+uint32_t size1 = sizeof("Ingresa un valor valido entre 1 y 3\n");
+uint32_t* NoValue = (uint32_t*)"Ingresa un valor valido entre 1 y 3\n";
 
-uint32_t size2 = sizeof("1. Detener\n2. Continuar");
-uint32_t* NoValue2 = (uint32_t*)"1. Detener\n2. Continuar";
+uint32_t size2 = sizeof("1. Detener\n2. Continuar\n");
+uint32_t* NoValue2 = (uint32_t*)"1. Detener\n2. Continuar\n";
 
-uint32_t size3 = sizeof("Audio\n1. Audio 1\n2. Audio 2");
-uint32_t* NoValue3 = (uint32_t*)"Audio\n1. Audio 1\n2. Audio 2";
+uint32_t size3 = sizeof("Audio\n1. Audio 1\n2. Audio 2\n");
+uint32_t* NoValue3 = (uint32_t*)"Audio\n1. Audio 1\n2. Audio 2\n";
 
-uint32_t size4 = sizeof("Paquete recibidos:\nPaquetes perdidos\n Calidad de COmunicación");
-uint32_t* NoValue4 = (uint32_t*)"Audio\n1. Audio 1\n2. Audio 2";
+uint32_t size4 = sizeof("Paquete recibidos:\nPaquetes perdidos\n Calidad de COmunicación\n");
+uint32_t* NoValue4 = (uint32_t*)"Audio\n1. Audio 1\n2. Audio 2\n";
 
 //void* pVoid;
 uint8_t *MenuValue;
 uint8_t MenuValue1;
-uint32_t MenuValue2;
+uint8_t *RcvForMenu;
+uint8_t RcvForMenu1;
+struct netbuf *rcvbuf;
+void *rcvdata;
+u16_t rcvlen;
 struct netconn *newconnG;
+err_t err1;
 /*-----------------------------------------------------------------------------------*/
 
 
@@ -75,10 +80,10 @@ tcpecho_thread(void *arg)
   /* Bind connection to well known port number 7. */
 #if LWIP_IPV6
   conn = netconn_new(NETCONN_TCP_IPV6);
-  netconn_bind(conn, IP6_ADDR_ANY, 40000);
+  netconn_bind(conn, IP6_ADDR_ANY, 58000);
 #else /* LWIP_IPV6 */
   conn = netconn_new(NETCONN_TCP);
-  netconn_bind(conn, IP_ADDR_ANY, 40000);
+  netconn_bind(conn, IP_ADDR_ANY, 58000);
 #endif /* LWIP_IPV6 */
   LWIP_ERROR("tcpecho: invalid conn", (conn != NULL), return;);
 
@@ -111,7 +116,7 @@ tcpecho_thread(void *arg)
              {
             	 netconn_write(newconn, NoValue, size1, NETCONN_COPY);
              }
-             err = netconn_write(newconn, data, len, NETCONN_COPY);
+             //err = netconn_write(newconn, data, len, NETCONN_COPY);
 #if 0
             if (err != ERR_OK) {
               printf("tcpecho: netconn_write: error \"%s\"\n", lwip_strerr(err));
@@ -143,11 +148,23 @@ void printf_menu3(void)
 	netconn_write(newconnG, NoValue4, size4, NETCONN_COPY);
 }
 
+uint8_t receiveDataForMenu(void)
+{
+	netbuf_delete(rcvbuf);
+	if((err1 = netconn_recv(newconnG, &rcvbuf)) == ERR_OK)
+	{
+		netbuf_data(rcvbuf, &rcvdata, &rcvlen);
+		RcvForMenu = rcvdata;
+		RcvForMenu1 = (*RcvForMenu-48);
+	}
+	return RcvForMenu1;
+}
+
 void
 tcpecho_init(void)
 {
 	//static Menu_handle_t Handles;
-	sys_thread_new("tcpecho_thread", tcpecho_thread, NULL, DEFAULT_THREAD_STACKSIZE, DEFAULT_THREAD_PRIO);
+	sys_thread_new("tcpecho_thread", tcpecho_thread, NULL, 1000, 3);
 }
 /*-----------------------------------------------------------------------------------*/
 

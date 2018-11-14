@@ -12,14 +12,15 @@ UDP_PORT = 54001
 socket_client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 socket_client.connect((UDP_IP, UDP_PORT))
 
-buffer_size = 250;
+buffer_size = 280;
 
-archivo = 'muestra01_ElAguacateIntro.wav'
+archivo = '500miles.wav'
 muestreo, sonido = waves.read(archivo)
-
+#print(len(sonido))
 Fs=muestreo
 f=5
-sample = buffer_size*441;
+sample = buffer_size*17283;
+#print(sample)
 song_data=[0]*sample
 for n in range(sample):
     song_data[n]= .06248559*(sonido[n] + 32768)
@@ -32,7 +33,7 @@ send_end = buffer_size;
 cont_song = 0;
 
 socket_client.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1);
-
+print('connect')
 while 1:
 
     socket_client.sendto(song_data[send_start:send_end], (UDP_IP, UDP_PORT))

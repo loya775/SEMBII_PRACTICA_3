@@ -47,6 +47,6 @@ void printf_menu1(void);
 void printf_menu2(void);
 void printf_menu3(void);
 void tcpecho_init(void);
-
+void package_display(uint32_t Rcv_Package );
 
 #endif /* LWIP_TCPECHO_H */

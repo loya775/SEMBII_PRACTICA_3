@@ -23,10 +23,12 @@
 #include "lwip/sys.h"
 
 #include "rtos_edma.h"
+#include "tcpecho.h"
 
 #define PIT_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_BusClk)
-#define BUFFER_SIZE 279
-#define PIT_PERIOD ((1000000U/44100U) - 11)
+#define BUFFER_SIZE 249
+#define PIT_PERIOD ((1000000U/44100U))
+#define PIT_PERIOD2 ((1000000U))
 
 static SemaphoreHandle_t dac_signal[2];
 static uint8_t currentBuffer = 0, bufferIndex = 0, bufferIsReady[2] = {0};
@@ -36,12 +38,14 @@ uint8_t count = 0;
 
 struct netconn *conn;
 uint8_t listen = 1;
+uint32_t packet = 0;
 /*-----------------------------------------------------------------------------------*/
 static void
 udp_server_thread(void *arg)
 {
 	dac_init();
 	pit_init();
+	pit_init_2();
 
 	//struct netconn *conn;
 	LWIP_UNUSED_ARG(arg);
@@ -52,6 +56,7 @@ udp_server_thread(void *arg)
 	{
 	  netconn_recv(conn, &buf[bufferIndex]);
 	  edma_wait();
+	  packet = (packet + 1)%44100;
 	  //PRINTF("RB%d\n\r",bufferIndex);
 	  bufferIsReady[bufferIndex] = 1;
 	  bufferIndex = (bufferIndex + 1)%2;
@@ -94,11 +99,17 @@ void PIT0_IRQHandler(void)
 		}
     }
 }
+
+void PIT1_IRQHandler(void)
+{
+	PIT_ClearStatusFlags(PIT, kPIT_Chnl_1, kPIT_TimerFlag);
+	packet=0;
+}
 /*-----------------------------------------------------------------------------------*/
 void
 udp_task_init(void)
 {
-	sys_thread_new("server_thread", udp_server_thread, NULL, 1000, 10);
+	sys_thread_new("server_thread", udp_server_thread, NULL, 300, 3);
 }
 
 void dac_init(void)
@@ -129,10 +140,28 @@ void pit_init(void)
 	PIT_EnableInterrupts(PIT, kPIT_Chnl_0, kPIT_TimerInterruptEnable);
 	/* Enable at the NVIC */
 	EnableIRQ(PIT0_IRQn);
-	NVIC_SetPriority(PIT0_IRQn, 5);
+	NVIC_SetPriority(PIT0_IRQn, 4);
 
 	/* Start channel 0 */
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
+}
+void pit_init_2(void)
+{
+	pit_config_t pitConfig;
+
+	pitConfig.enableRunInDebug = true;
+	/* Init pit module */
+	PIT_Init(PIT, &pitConfig);
+	/* Set timer period for channel 0 */
+	PIT_SetTimerPeriod(PIT, kPIT_Chnl_1, USEC_TO_COUNT(PIT_PERIOD2, PIT_SOURCE_CLOCK));
+	/* Enable timer interrupts for channel 0 */
+	PIT_EnableInterrupts(PIT, kPIT_Chnl_1, kPIT_TimerInterruptEnable);
+	/* Enable at the NVIC */
+	EnableIRQ(PIT1_IRQn);
+	NVIC_SetPriority(PIT1_IRQn, 8);
+
+	/* Start channel 0 */
+	//PIT_StartTimer(PIT, kPIT_Chnl_0);
 }
 
 void udp_Stop_Audio(uint8_t Open_Close)
@@ -150,9 +179,23 @@ void udp_Change_Audio(uint8_t Open_Close)
 {
 	if(Open_Close==2)
 	{
-		netconn_bind(conn, IP_ADDR_ANY, 55000);
+		netconn_bind(conn, IP_ADDR_ANY, 54001);
 	}else if(Open_Close == 1)
 	{
-		netconn_bind(conn, IP_ADDR_ANY, 60000);
+		netconn_bind(conn, IP_ADDR_ANY, 50000);
 	}
 }
+
+void pit_start_timer(uint8_t StopStart)
+{
+	if(StopStart==1)
+	{
+	PIT_StartTimer(PIT, kPIT_Chnl_1);
+	package_display(packet);
+	}else if(StopStart==2)
+	{
+		PIT_StopTimer(PIT, kPIT_Chnl_1);
+	}
+}
+
+

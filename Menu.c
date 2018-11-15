@@ -51,7 +51,14 @@ typedef const struct Function
 		}
 		void Menu_Display(uint8_t StopStart)
 		{
+			Valor = 0;
 			printf_menu3();
+			while(Valor != 3)
+			{
+				Valor = receiveDataForMenu();
+				pit_start_timer(Valor);
+			}
+
 		}
 
 		void choose_function(uint8_t State)

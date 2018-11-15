@@ -160,7 +160,7 @@ int main(void)
     BOARD_InitPins();
     BOARD_BootClockRUN();
     BOARD_InitDebugConsole();
-    /* Dis1
+    /* Dis1uuu
      * able SYSMPU. */
     base->CESR &= ~SYSMPU_CESR_VLD_MASK;
 

@@ -56,7 +56,7 @@ typedef const struct Function
 			while(Valor != 3)
 			{
 				Valor = receiveDataForMenu();
-				pit_start_timer(Valor);
+				start_timer(Valor);
 			}
 
 		}

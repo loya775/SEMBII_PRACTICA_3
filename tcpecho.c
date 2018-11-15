@@ -66,8 +66,8 @@ uint32_t* NoValue6 = (uint32_t*)"Paquetes perdidos\n";
 uint32_t size7 = sizeof("Calidad de Comunicación\n");
 uint32_t* NoValue7 = (uint32_t*)"Calidad de Comunicación\n";
 
-uint32_t size8 = sizeof("00000\n");
-uint32_t* NoValue8 = (uint32_t*)"00000\n";
+uint32_t size8 = sizeof("\n");
+uint32_t* NoValue8 = (uint32_t*)"\n";
 
 //void* pVoid;
 uint8_t *MenuValue;
@@ -172,7 +172,7 @@ void package_display(uint32_t Rcv_Package )
 	uint32_t RcvPackageA[7];
 	uint32_t LostPackageA[6];
 	uint32_t PercentA[4];
-	PIT_StopTimer(PIT, kPIT_Chnl_1);
+	//PIT_StopTimer(PIT, kPIT_Chnl_1);
 	RcvPackageA[0] = (Rcv_Package/10000)+48;
 	RcvPackageA[1] = (((Rcv_Package-((RcvPackageA[0]-48)*10000))/1000)+48);
 	RcvPackageA[2] = ((Rcv_Package-((RcvPackageA[0]-48)*10000)-((RcvPackageA[1]-48)*1000))/100)+48;
@@ -181,11 +181,13 @@ void package_display(uint32_t Rcv_Package )
 	RcvPackageA[0] += (RcvPackageA[1]<<8) + (RcvPackageA[2]<<16) + (RcvPackageA[3] <<24);
 	RcvPackageA[1] = RcvPackageA[4] + 0xA00;
 	pRcvPackage = &RcvPackageA[0];
-	LostPackage = 44100-Rcv_Package;
+	LostPackage = 176-Rcv_Package;
 
-	PercentPackage = ((Rcv_Package*100)/44100);
+	PercentPackage = ((Rcv_Package*100)/176);
 	netconn_write(newconnG, NoValue5, size5, NETCONN_COPY);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 	netconn_write(newconnG, pRcvPackage, 5, NETCONN_COPY);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 
 	LostPackageA[0] = (LostPackage/10000)+48;
 	LostPackageA[1] = ((LostPackage-((LostPackageA[0]-48)*10000))/1000)+48;
@@ -197,16 +199,21 @@ void package_display(uint32_t Rcv_Package )
 	pLostPackage = &LostPackageA[0];
 
 	netconn_write(newconnG, NoValue6, size6, NETCONN_COPY);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 	netconn_write(newconnG, pLostPackage, 5, NETCONN_COPY);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 
 	PercentA[0] = (PercentPackage/100)+48;
 	PercentA[1] = ((PercentPackage-((PercentA[0]-48)*100))/10)+48;
 	PercentA[2] = ((PercentPackage-((PercentA[0]-48)*100)-((PercentA[1]-48)*10)))+48;
 	PercentA[0] += (PercentA[1]<<8) + (PercentA[2]<<16);
 	pPercent = &PercentA[0];
+
 	netconn_write(newconnG, NoValue7, size7, NETCONN_COPY);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 	netconn_write(newconnG, pPercent, 3, NETCONN_COPY);
-	PIT_StartTimer(PIT, kPIT_Chnl_1);
+	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
+	//PIT_StartTimer(PIT, kPIT_Chnl_1);
 }
 
 uint8_t receiveDataForMenu(void)

@@ -41,6 +41,7 @@
 
 
 #define GET_ARGS(args,type) *((type*)args)
+//In this section we put all the information to send to cellphone
 
 uint32_t size = sizeof("1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion\n");
 uint32_t* Menu = (uint32_t*)"1. Detener/Reproducir audio\n2. Seleccionar audio\n3. Desplegar estadisticas de la comunicacion\n";
@@ -69,11 +70,14 @@ uint32_t* NoValue7 = (uint32_t*)"Calidad de Comunicación\n";
 uint32_t size8 = sizeof("\n");
 uint32_t* NoValue8 = (uint32_t*)"\n";
 
-//void* pVoid;
+//MenuValue y MenuValue1 are used to convert the information receive from the cellphone
 uint8_t *MenuValue;
 uint8_t MenuValue1;
+/*RcvForMenu and RcvForMenu1 wors as MenuValue also transform the data from the cellphone
+but in this case we used it for the interaction between the menus and in the cellphone*/
 uint8_t *RcvForMenu;
 uint8_t RcvForMenu1;
+// We use this part to create all the variables for the TCP initialization
 struct netbuf *buftcp;
 void *rcvdata;
 u16_t rcvlen;
@@ -118,7 +122,11 @@ tcpecho_thread(void *arg)
       while ((err = netconn_recv(newconn, &buftcp)) == ERR_OK) {
         /*printf("Recved\n");*/
         do {
-             netbuf_data(buftcp, &data, &len);
+            /*We receive the info and we transform in to a             
+	    8 bit int and we send it to
+             * the choose function menu*/
+             
+	     netbuf_data(buftcp, &data, &len);
              MenuValue = data;
              MenuValue1 = (*MenuValue-48);
              if ((MenuValue1) > 0 && (MenuValue1))
@@ -145,21 +153,25 @@ tcpecho_thread(void *arg)
   }
 }
 /*-----------------------------------------------------------------------------------*/
+/*Prints the first menu which is Stop and Reproduce menu */
+
 void printf_menu1(void)
 {
 	netconn_write(newconnG, NoValue2, size2, NETCONN_COPY);
 }
-
+/*Prints the second menu which is Change User*/
 void printf_menu2(void)
 {
 	netconn_write(newconnG, NoValue3, size3, NETCONN_COPY);
 }
+/*Prints the third menu which is display the state of the connection*/
 
 void printf_menu3( )
 {
 	netconn_write(newconnG, NoValue4, size4, NETCONN_COPY);
 }
 
+/*This function calculate the receive package, lost package and connection quality*/
 void package_display(uint32_t Rcv_Package )
 {
 	//uint8_t msg[] = "Paquetes recibidos =      \n\rPaquetes perdidos =   \n\rCalidad de comunicacion =   ";
@@ -215,7 +227,7 @@ void package_display(uint32_t Rcv_Package )
 	netconn_write(newconnG, NoValue8, size8, NETCONN_COPY);
 	//PIT_StartTimer(PIT, kPIT_Chnl_1);
 }
-
+/*This function is call when we want to receive info from the user return an 8 bit int*/
 uint8_t receiveDataForMenu(void)
 {
 	netbuf_delete(buftcp);

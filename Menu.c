@@ -8,10 +8,12 @@
 #include "audio.h"
 #include "tcpecho.h"
 
+
 uint8_t FlagMenu1=0;
 uint8_t FlagMenu2=0;
 uint8_t FlagMenu3=0;
 uint8_t Valor;
+
 typedef const struct Function
 		{
 			void(*fptr)(uint8_t StopStart);
@@ -25,7 +27,9 @@ typedef const struct Function
 				{Menu_Display,3},
 
 };
-
+		/*This menu print if you want to stop or play the audio
+		 * As we can see once we print the menu we wait until the user of the cellphone
+		* tell us what task we implemented*/
 		void Menu_StopReady(uint8_t StopStart)
 		{
 			Valor=0;
@@ -36,7 +40,9 @@ typedef const struct Function
 			udp_Stop_Audio(Valor);
 			}
 		}
-
+		/*This menu print which audio you want to hear*
+		* As we can see once we print the menu we wait until the user of the cellphone
+		 * tell us what task we implemented*/
 		void Menu_SelectAudio(uint8_t StopStart)
 		{
 			Valor = 0;
@@ -49,6 +55,9 @@ typedef const struct Function
 
 
 		}
+		/*This menu display the state of the connection
+		 * As we can see once we print the menu we wait until the user of the cellphone
+		 * tell us what task we implemented*/
 		void Menu_Display(uint8_t StopStart)
 		{
 			Valor = 0;
@@ -61,6 +70,7 @@ typedef const struct Function
 
 		}
 
+		/*This is the pointer to function we use to select which menu we will print*/
 		void choose_function(uint8_t State)
 		{
 			FSMMoore[State].fptr(State);
